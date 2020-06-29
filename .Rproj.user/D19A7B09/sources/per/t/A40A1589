@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592968768574.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3301243223",
+    "id" : "A40A1589",
+    "lastKnownWriteTime" : 1592969524,
+    "last_content_update" : 1592969524457,
+    "path" : "D:/Miller/ASR_miller_schwarz/ASR_miller_schwarz/asr_fit.R",
+    "project_path" : "asr_fit.R",
+    "properties" : {
+        "cursorPosition" : "163,31",
+        "scrollLine" : "142",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

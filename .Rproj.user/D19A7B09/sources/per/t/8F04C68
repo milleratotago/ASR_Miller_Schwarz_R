@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592967901879.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3247566245",
+    "id" : "8F04C68",
+    "lastKnownWriteTime" : 1592967959,
+    "last_content_update" : 1592967959042,
+    "path" : "D:/Miller/ASR_miller_schwarz/ASR_miller_schwarz/scratch_paper.R",
+    "project_path" : "scratch_paper.R",
+    "properties" : {
+        "cursorPosition" : "25,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

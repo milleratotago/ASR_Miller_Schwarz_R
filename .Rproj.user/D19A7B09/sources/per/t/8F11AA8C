@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592954652259.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1699198894",
+    "id" : "8F11AA8C",
+    "lastKnownWriteTime" : 1592962637,
+    "last_content_update" : 1592962637710,
+    "path" : "D:/Miller/ASR_miller_schwarz/ASR_miller_schwarz/asr_toolkit_examples.R",
+    "project_path" : "asr_toolkit_examples.R",
+    "properties" : {
+        "cursorPosition" : "0,24",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

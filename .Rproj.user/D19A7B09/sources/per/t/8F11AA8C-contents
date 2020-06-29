@@ -1,0 +1,68 @@
+# To run these examples:
+
+# 1. Place file asr_sample_data.csv into the project's root directory
+# 2. Source this file
+# 3. Call function asr_fit_demo()
+# 4. Call function asr_predictions_demo()
+
+
+
+library(gamlss)
+library(pracma)
+
+source("asr_fit.R")
+source("asr_distribution.R")
+source("asr_predictions.R")
+
+#################################################################################
+# 1. Fitting an ASR model (i.e. estimating model parameters) from reaction time data
+#################################################################################
+
+#################################################################################
+# asr_fit_demo: Date for three real subjects.
+#################################################################################
+asr_fit_demo <- function()
+{
+  test_data_df <- read.csv("asr_sample_data.csv", header = TRUE)
+  
+  # Subject 2 from sample data file
+  print("Working...please wait")
+  subject_02 <- test_data_df[test_data_df$SubNo == 2,]
+  subject_02_con <- subject_02[subject_02$Congru == 1,]
+  subject_02_inc <- subject_02[subject_02$Congru == 2,]
+  
+  # Sample subject 2. LambdaExc fixed
+  print("Fixed lambda_exc - parameter estimates")
+  
+  # Function asr-fit will display the best model estimates (i.e. for starting
+  # parameters that result in the smallest error) The output object of asr_fit
+  # contains estimate and error values for all starting parameters as well as
+  # the best estimates. User can do further work with those data, as desired.
+  fixed_exc <- asr_fit(subject_02_con$RT, subject_02_inc$RT)
+  
+  # Sample subject 2. LambdaExc allowed to vary
+  print("Lambda_exc allowed to vary - parameter estimates")
+  varying_exc <- asr_fit(subject_02_con$RT, subject_02_inc$RT, estimate_excitation = TRUE)
+
+}
+
+#################################################################################
+# 2. Generating predicted reaction time distributions and delta plots from 
+#    specific values of the ASR model parameters
+#################################################################################
+
+##############################################################################
+asr_predictions_demo <- function()
+{
+  tau_A <- 80
+  tau_B <- 100
+  mu_C <- 400
+  sigma_C <- 50
+  lambda_exc <- 0
+  lambda_inh <- 70
+  soa <- 0
+  
+  asr_pred_df <- asr_predictions(tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+  head(asr_pred_df)
+}
+

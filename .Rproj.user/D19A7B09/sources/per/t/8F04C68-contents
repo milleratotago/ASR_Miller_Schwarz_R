@@ -1,0 +1,58 @@
+# Jeff example 2
+  tau_A <- 108
+  tau_B <- 91
+  mu_C <- 423
+  sigma_C <- 47.5
+  lambda_exc <- -10
+  lambda_inh <- 67
+  soa <- 25
+  
+  asr_pred_df <- asr_predictions(tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+  head(asr_pred_df)
+
+# Jeff example 3
+  tau_A <- 84
+  tau_B <- 97
+  mu_C <- 388
+  sigma_C <- 38
+  lambda_exc <- -4
+  lambda_inh <- 170
+  soa <- 33
+
+  asr_pred_df <- asr_predictions(tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+  head(asr_pred_df)
+
+ 
+# Density function checks
+  alpha <- 1/tau_A
+  beta <- 1/tau_B
+  f_rt_all(400, alpha, beta, mu_C, sigma_C, 0, 0)
+  f_rt_all(400, alpha, beta, mu_C, sigma_C, 10, 0)
+  f_rt_all(400, alpha, beta, mu_C, sigma_C, 0, 30)
+  f_rt_all(400, alpha, beta, mu_C, sigma_C, -10, 0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
