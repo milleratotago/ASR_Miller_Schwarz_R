@@ -23,7 +23,8 @@
 # is fixed at 0. (See Miller and Schwarz, 2020)
 #################################################################################
 asr_fit <- function(congruent_rts, incongruent_rts, soa, 
-                    resolution = 0.2, estimate_excitation = FALSE)
+                    resolution = 0.2, estimate_excitation = FALSE,
+                    display_params = TRUE)
 {
   
   library(gamlss) # for dexGAUS
@@ -113,7 +114,9 @@ asr_fit <- function(congruent_rts, incongruent_rts, soa,
                 AllErrors = fmin_list)
   
   # Display !!! Remove in prod
-  print(as.data.frame(parameter_estimates))
+  if (display_params) {
+    print(as.data.frame(parameter_estimates))
+  }
   
   return(output)
 }
