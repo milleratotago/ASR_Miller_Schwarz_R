@@ -113,7 +113,7 @@ asr_fit <- function(congruent_rts, incongruent_rts, soa,
                 AllParameterEstimates = xmin_list,
                 AllErrors = fmin_list)
   
-  # Display !!! Remove in prod
+  # Display parameters for this subject
   if (display_params) {
     print(as.data.frame(parameter_estimates))
   }
