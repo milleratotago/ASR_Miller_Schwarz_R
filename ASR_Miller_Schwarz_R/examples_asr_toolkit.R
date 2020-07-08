@@ -7,14 +7,16 @@
 
 ###### Note re lambda_inh and lambda_exc:
 #
-# For prediction, the lambda parameters should always be provided as positive
-# numbers, which indicate the magnitude of the effect in msec. Lambda_inh is an
-# inhibitory effect (i.e. it slows responses, raising RT) and lambda_exc is a
-# facilitative effect (i.e. it speeds responses, reducing RT).
+# For prediction, the lambda parameters should be thought of (approximately) as
+# changes in RT, in msec.  Thus, lambda_inh is a positive number, representing
+# an increase in RT produced by inhibition from incongruent activation, and
+# lambda_exc is a negative number, representing a decrease in RT produced by
+# facilitation from congruent activation.
 #
 # During fitting, the system will find best estimates for lambda_inh and
-# (optionally) lambda_exc. Should either of these values be negative, it
-# indicates that the effect of the term is opposite to its usual direction. 
+# (optionally) lambda_exc. Should either of these values have the opposite
+# of its expected positive/negative sign, it indicates that the data suggest
+# the effect of the term was opposite to its usual direction. 
 
 library(gamlss)
 library(pracma)
@@ -35,6 +37,7 @@ asr_fit_demo <- function()
   # Allow some time for large data sets...
   print("Working...please wait")
   
+  # Load some sample data to which the model can be fit
   test_data_df <- read.csv("asr_sample_data.csv", header = TRUE)
   
   # Fit each subject individually. Here, we fit subject 2

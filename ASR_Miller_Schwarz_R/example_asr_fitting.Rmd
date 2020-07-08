@@ -1,0 +1,94 @@
+---
+title: "asr_fit_example"
+author: "Jeff Miller"
+date: "6/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Example of fitting ASR to experimental data
+
+This file gives a small example of how you might write code
+to fit the ASR model to your observed RT data.
+
+## Setup
+
+First load the necessary packages and functions so that R will recognize the toolkit functions:
+
+```{r initialize, include=TRUE, results='hide', warning=FALSE}
+library(gamlss, quietly = TRUE)
+library(pracma)
+
+source("asr_fit.R")
+source("asr_distribution.R")
+source("asr_predictions.R")
+```
+
+## Load some example data
+
+We need some data to illustrate the fitting process.
+Of course you would load your own data here.
+
+```{r load}
+test_data_df <- read.csv("asr_sample_data.csv", header = TRUE)
+head(test_data_df)
+```
+
+## Fit the model
+
+The function asr_fit does all the work of fitting the ASR model (i.e. estimate model parameters) to a given
+set of congruent and incongruent RTs.
+
+You have to write code to (a) select out the appropriate RTs for each subject, condition, etc, and (b) save the fitted parameter values.
+
+For this illustration, only two subjects are fit in the interests of speed:
+
+```{r fitting}
+# Initialise soa based on the experimental design from which
+# the data are derived
+soa <- 0
+
+# Make an empty data frame to hold the parameter estimates for all participants
+allBest = data.frame()
+ 
+for (iSub in c(2,3)) {
+  
+  # Fit each subject individually.
+  # paste("fitting subject",iSub)
+  
+  # First, select the congruent & incongruent RTs for this subject.
+  # You probably also want to exclude errors & outlier RTs,
+  # but that is not illustrated.
+  # If you have an experimental factor (e.g. SOA) such that there are 
+  # multiple congruent/incongruent pairs per subject, then you would
+  # fit each pair separately.
+  obsRTcon <- test_data_df$RT[test_data_df$SubNo == iSub
+                              & test_data_df$Congru == 1]
+  
+  obsRTinc <- test_data_df$RT[test_data_df$SubNo == iSub
+                              & test_data_df$Congru==2]
+  
+  # Function asr_fit finds the maximum likelihood estimates of the model 
+  # parameters and stores them in the BestParameters field of the output.
+  # By default, asr_fit assumes that lambda_exc is fixed at 0.
+  # For explanation of the other outputs in fixed_exc, check the
+  # comments in the asr_fit function.
+  fixed_exc <- asr_fit(obsRTcon,obsRTinc,soa,display_params = FALSE)
+  
+  # Now extract the parameters for this subject from fixed_exc, add the subject ID,
+  # and save the results as a new row in the allBest data_frame.
+  currentRow <- fixed_exc$BestParameters
+  currentRow <- c(SubNo = iSub,currentRow, BestError = fixed_exc$MinError)
+  allBest <- rbind(allBest,currentRow)
+}
+```
+## Look at the results
+
+The allBest data frame now has the best parameter estimates for all subjects:
+```{r}
+allBest
+```
+These parameter values could then be compared between groups or conditions using standard statistical techniques (e.g., t-tests, ANOVAs), in essentially the same way as other RT results could be compared (e.g., condition mean RTs, parameters of ex-Gaussian or other model fits).
