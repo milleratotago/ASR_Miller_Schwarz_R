@@ -27,7 +27,7 @@ asr_fit <- function(congruent_rts, incongruent_rts, soa,
                     display_params = TRUE)
 {
   
-  library(gamlss) # for dexGAUS
+  #  library(gamlss) # originally included for dexGAUS, but this was replaced by exgauss for better control over exp overflow problems.
   library(pracma) # for fminsearch
   
   # Prepare to track best (minimum) value of fmin (error) returned by fminsearch
@@ -125,16 +125,35 @@ asr_fit <- function(congruent_rts, incongruent_rts, soa,
 # Utility functions
 #################################################################################
 
+################################################################################
+# pdf of ex-Gaussian distribution
+################################################################################
+dexgauss <- function(X,mu,sigma,tau)
+{
+    rate <- 1/tau
+    t1 <- -X*rate + mu*rate + 0.5*(sigma*rate)^2
+    t2 <- (X - mu - sigma^2*rate) / sigma
+    thispdf <- rate*exp( t1 + log(pnorm(t2)) )
+    # The above is the theoretical definition of the ex-Gaussian pdf,
+    # but there are numerical problems if t1 > 708 or so, because then exp(t1) overflows.
+    # That happens when tau is small relative to sigma (so (sigma*rate)^2 is large).
+    # In that case, though, the exG density is very close to a normal with mean mu+tau & variance sigma^2+tau^2,
+    # so we can just use that corresponding normal pdf in those cases to avoid numerical problems:
+    t1bad <- t1 > 708;  # vector indicating too-large t1's for which we should use the normal approximation.
+    thispdf[t1bad] <- dnorm(X[t1bad],mu+tau,sqrt(sigma^2+tau^2))
+    return(thispdf)
+}
+
 ##############################################################################
 # f_rt_b_less_a: Function describing the density of t when B is less than A
 # Formula A.3 in the manuscript
 ###############################################################################
 f_rt_b_less_a <- function(t,alpha, beta, mu_C, sigma_C, lambda)
 {
-  dexGAUS(t,
+  dexgauss(t,
           mu = mu_C + lambda,
           sigma = sigma_C,
-          nu = 1/(alpha + beta))
+          tau = 1/(alpha + beta))
 }
 
 ##############################################################################
@@ -143,14 +162,14 @@ f_rt_b_less_a <- function(t,alpha, beta, mu_C, sigma_C, lambda)
 ###############################################################################
 f_rt_b_greater_a <- function(t, alpha, beta, mu_C, sigma_C, soa)
 {
-  exg_01 <- dexGAUS(t,
+  exg_01 <- dexgauss(t,
                     mu = mu_C,
                     sigma = sigma_C,
-                    nu = 1/beta)
-  exg_02 <- dexGAUS(t,
+                    tau = 1/beta)
+  exg_02 <- dexgauss(t,
                     mu = mu_C,
                     sigma = sigma_C,
-                    nu = 1/(alpha + beta))
+                    tau = 1/(alpha + beta))
   
  # ((1 + (beta/alpha)) * exg_01) - ((beta/alpha) * exg_02)
   
@@ -170,7 +189,13 @@ f_rt_all <- function(t, alpha, beta, mu_C, sigma_C, lambda, soa)
   q_s <- (beta/(alpha + beta)) * exp(-alpha * soa)
   f_plus <- f_rt_b_less_a(t, alpha, beta, mu_C, sigma_C, lambda)
   f_minus <- f_rt_b_greater_a(t, alpha, beta, mu_C, sigma_C, soa)
-  (q_s * f_plus) + ((1-q_s) * f_minus)
+  thispdf <- (q_s * f_plus) + ((1-q_s) * f_minus)
+  # Due to numerical problems with some extreme parameter combinations, thispdf values
+  # can sometimes be less than zero, which is of course impossible.
+  # To circumvent that problem, we set pdf values <= 0 to very small positive values.
+  badpdf <- thispdf <= 0
+  thispdf[badpdf] = .Machine$double.xmin
+  return(thispdf)
 }
 
 #############################################################################
