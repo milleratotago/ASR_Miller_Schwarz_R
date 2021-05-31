@@ -12,7 +12,7 @@
 source("asr_fit.R")
 
 # lambda_exc should be supplied by the user as a negative value for
-# facilitiation (i.e. speeding reaction times)
+# facilitation (i.e. speeding reaction times)
 dasr <- function(t, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
 {
   alpha <- 1/tau_A
