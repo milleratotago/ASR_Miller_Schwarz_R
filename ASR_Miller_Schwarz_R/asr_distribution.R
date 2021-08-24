@@ -7,31 +7,31 @@
 #              density p
 #
 # Additional params for each method are tau_A, tau_B, mu_C,
-# sigma_C, lambda_inh and lambda_exc
+# sigma_Cab, sigma_Cba, lambda_inh and lambda_exc
 ###########################################################
 source("asr_fit.R")
 
 # lambda_exc should be supplied by the user as a negative value for
 # facilitation (i.e. speeding reaction times)
-dasr <- function(t, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+dasr <- function(t, tau_A, tau_B, mu_C, sigma_Cab, sigma_Cba, lambda_inh, lambda_exc, soa)
 {
   alpha <- 1/tau_A
   beta <- 1/tau_B
-  d_con <- f_rt_all(t, alpha, beta, mu_C, sigma_C, lambda_exc, soa)
-  d_incon <- f_rt_all(t, alpha, beta, mu_C, sigma_C, lambda_inh, soa)
+  d_con <- f_rt(t, alpha, beta, mu_C, sigma_Cab, lambda_exc, sigma_Cba, soa)
+  d_incon <- f_rt(t, alpha, beta, mu_C, sigma_Cab, lambda_inh, sigma_Cba, soa)
   result <- c(d_con = d_con, d_incon = d_incon)
   return(result)
 }
 
 # lambda_exc should be supplied by the user as a negative value for
 # facilitiation (i.e. speeding reaction times)
-pasr <- function(t, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+pasr <- function(t, tau_A, tau_B, mu_C, sigma_Cab, sigma_Cba, lambda_inh, lambda_exc, soa)
 {
   alpha <- 1/tau_A
   beta <- 1/tau_B
-  cdf_con <- integrate(function(t) {f_rt_all(t, alpha, beta, mu_C, sigma_C, lambda_exc, soa)},
+  cdf_con <- integrate(function(t) {f_rt(t, alpha, beta, mu_C, sigma_Cab, lambda_exc, sigma_Cba, soa)},
                    lower = 1, upper = t)
-  cdf_incon <- integrate(function(t) {f_rt_all(t, alpha, beta, mu_C, sigma_C, lambda_inh, soa)},
+  cdf_incon <- integrate(function(t) {f_rt(t, alpha, beta, mu_C, sigma_Cab, lambda_inh, sigma_Cba, soa)},
                        lower = 1, upper = t)
   result <- c(p_con = cdf_con$value, p_incon = cdf_incon$value)
   return(result)
@@ -39,23 +39,23 @@ pasr <- function(t, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
 
 
 
-f_to_zero <- function(t, target_p, tau_A, tau_B, mu_C, sigma_C, lambda, soa)
+f_to_zero <- function(t, target_p, tau_A, tau_B, mu_C, sigma_Cab, lambda, sigma_Cba, soa)
 {
   alpha <- 1/tau_A
   beta <- 1/tau_B
-  cdf_t <- integrate(function(t) {f_rt_all(t, alpha, beta, mu_C, sigma_C, lambda, soa)},
+  cdf_t <- integrate(function(t) {f_rt(t, alpha, beta, mu_C, sigma_Cab, lambda, sigma_Cba, soa)},
                                   lower = 1, upper = t)
   return(cdf_t$value - target_p)
 }
 
 # lambda_exc should be supplied by the user as a negative value for
 # facilitiation (i.e. speeding reaction times)
-qasr <- function(p, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+qasr <- function(p, tau_A, tau_B, mu_C, sigma_Cab, sigma_Cba, lambda_inh, lambda_exc, soa)
 {
   estimate <- tau_B + mu_C
-  inv_cdf_con <- fzero(function(t) {f_to_zero(t, p, tau_A, tau_B, mu_C, sigma_C, lambda_exc, soa)},
+  inv_cdf_con <- fzero(function(t) {f_to_zero(t, p, tau_A, tau_B, mu_C, sigma_Cab, lambda_exc, sigma_Cba, soa)},
                  x = estimate)
-  inv_cdf_incon <- fzero(function(t) {f_to_zero(t, p, tau_A, tau_B, mu_C, sigma_C, lambda_inh, soa)},
+  inv_cdf_incon <- fzero(function(t) {f_to_zero(t, p, tau_A, tau_B, mu_C, sigma_Cab, lambda_inh, sigma_Cba, soa)},
                  x = estimate)
   result <- c(q_con <- inv_cdf_con$x, q_incon <- inv_cdf_incon$x)
   return(result)

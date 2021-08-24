@@ -84,7 +84,7 @@ asr_predictions_demo <- function()
   lambda_inh <- 67
   soa <- 25
   
-  asr_pred_df <- asr_predictions(tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+  asr_pred_df <- asr_predictions(tau_A = tau_A, tau_B = tau_B, mu_C = mu_C, sigma_Cab = sigma_C, sigma_Cba = sigma_C, lambda_inh = lambda_inh, lambda_exc = lambda_exc, soa = soa)
   head(asr_pred_df)
 }
 

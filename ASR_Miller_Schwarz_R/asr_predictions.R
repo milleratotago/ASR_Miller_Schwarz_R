@@ -8,7 +8,8 @@ source("asr_distribution.R")
 # lambda_exc should be supplied by the user as a negative value for
 # facilitiation (i.e. speeding reaction times)
 
-asr_predictions <- function(tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa,
+asr_predictions <- function(tau_A = 100, tau_B = 100, mu_C = 200, sigma_Cab = 40, sigma_Cba = 40,
+                            lambda_inh = 50, lambda_exc = -10, soa = 0,
                             percentiles = seq(0.005,0.995,0.01),
                             show_plots = TRUE)
 {
@@ -16,7 +17,7 @@ asr_predictions <- function(tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc,
   # Compute t values
   
   # sapply returns a 1 x n_percentile matrix. 1st row is congruent, 2nd row is incongruent
-  quantiles <- sapply(percentiles, FUN = qasr, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+  quantiles <- sapply(percentiles, FUN = qasr, tau_A, tau_B, mu_C, sigma_Cab, sigma_Cba, lambda_inh, lambda_exc, soa)
   quantiles_con <- quantiles[1,]
   quantiles_incon <- quantiles[2,]
   asr_df <- data.frame(p = percentiles, 
@@ -26,11 +27,11 @@ asr_predictions <- function(tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc,
   # We have different t values to inspect for con and incon
   
   # Get densities for the congruent t values (quantiles)
-  pdf_t_con <- sapply(quantiles_con, FUN = dasr, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+  pdf_t_con <- sapply(quantiles_con, FUN = dasr, tau_A, tau_B, mu_C, sigma_Cab, sigma_Cba, lambda_inh, lambda_exc, soa)
   pdf_con <- pdf_t_con["d_con",]
   
   # Get densities for the incongruent t values (quantiles)
-  pdf_t_incon <- sapply(quantiles_incon, FUN = dasr, tau_A, tau_B, mu_C, sigma_C, lambda_inh, lambda_exc, soa)
+  pdf_t_incon <- sapply(quantiles_incon, FUN = dasr, tau_A, tau_B, mu_C, sigma_Cab, sigma_Cba, lambda_inh, lambda_exc, soa)
   pdf_incon <- pdf_t_incon["d_incon", ] 
   
   # Add the new columns
