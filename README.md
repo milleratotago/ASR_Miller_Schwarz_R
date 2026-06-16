@@ -1,5 +1,7 @@
 # ASR_Miller_Schwarz_R
-R software for use with the Activation Suppression Race (ASR) model.
+
+R software for use with the Activation Suppression Race (ASR) model of Miller & Schwarz (2021).
+See Correction.pdf added 2026-06-17 for a corrected version of the original Figure 10b.
 
 Routines are provided for
 * fitting the model to existing sets of RTs from congruent and incongruent conditions.

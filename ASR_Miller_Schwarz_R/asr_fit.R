@@ -197,7 +197,7 @@ dexgauss <- function(X,mu,sigma,tau)
 
 ##############################################################################
 # f_rt_b_less_a: Function describing the density of t when B is less than A
-# Formula A.3 in the manuscript
+#  and SOA = 0. Formula A.3 in the manuscript
 ###############################################################################
 f_rt_b_less_a <- function(t,alpha, beta, mu_C, sigma_C, lambda)
 {

@@ -1,0 +1,130 @@
+---
+title: "Correction & Clarification"
+author: "Jeff Miller and Wolf Schwarz"
+date: "2026-06-17"
+output: pdf_document
+header-includes: |
+  \renewcommand{\P}{{\sf P}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Miller and Schwarz (2021) presented the ``Activation Suppression Race'' (ASR) model
+to describe reaction times (RTs) in the congruent and incongruent conditions of conflict tasks.
+In a section on possible extensions of the model, they tentatively considered two
+possible extensions to account for response accuracy as well as RTs.
+Figure 10 of that article shows accuracy predictions for one of those model extensions, but the predictions shown in Figure 10b are unfortunately incorrect
+due to a programming error^[We thank Valentin Koob for bringing this problem
+to our attention.].
+This document shows a corrected version of Figure 10b and also provides the explicit
+formal background for the predictions.
+
+Throughout this document, we follow the model framework and notation of Miller and Schwarz (2021), which we assume is familiar to the reader.
+We assume exponential durations for stages A and B (with rates $\alpha$ and $\beta$, respectively), and we consider the case of SOA = 0.
+Equation numbers refer to the equations in the Appendix of that paper.
+
+### Derivation of $P({\bf B} < {\bf A}|{\bf RT} = t)$ in the ASR model
+
+Figure 10a shows the probability $P({\bf B} < {\bf A})$ as a function of ${\bf RT} = t$
+for the congruent condition, and it is convenient to start with the derivation of this function. For convenience, we focus on the equivalent form $\P({\bf A} > {\bf B} | {\bf RT}=t)$.
+
+By the definition of conditional probability, 
+\begin{eqnarray*}
+\P({\bf A} > {\bf B} | {\bf RT}=t) & = & 
+\frac{\P({\bf A} > {\bf B} \land {\bf RT}=t) }{ \P({\bf RT}=t)}
+\end{eqnarray*}
+
+The denominator is just the standard RT density $f(t)$, as given by eq. A.6.
+It differs between the congruent and incongruent conditions because of their different values of $f^+(t)$, which in turn result from different values of $\lambda$.
+
+We next turn to the numerator, and re-write it as 
+\begin{eqnarray*}
+\P({\bf A} > {\bf B} \land {\bf RT}=t) & = & 
+\P({\bf A} > {\bf B}) \cdot \P({\bf RT}=t | {\bf A} > {\bf B}) 
+\end{eqnarray*}
+The first factor on the right side of the equation is clearly $\frac{\beta}{\alpha + \beta}$. 
+The second factor is the density --- called $f^+(t)$ in eq. A.3 --- 
+of ${\bf RT}={\bf B} + {\bf C}$ in the case when ${\bf A} > {\bf B}$;
+in the incongruent condition, this is the case when there is interference.
+
+It is a well-known property of exponential random variables that 
+if ${\bf B} < {\bf A}$ then the smaller value ${\bf B}$ is exponentially 
+distributed with rate $\alpha + \beta$. 
+Further, if ${\bf B} < {\bf A}$ then ${\bf C}$ is normally distributed 
+with mean $\mu + \lambda$ and standard deviation $\sigma$. 
+Therefore, if ${\bf B} < {\bf A}$, then ${\bf RT} = {\bf B} + {\bf C}$
+has an exG density in which the ``normal'' parameters (mean and standard deviation) 
+are $\mu+\lambda$ and $\sigma$, and the exponential mean is $\tau = 1/(\alpha +  \beta)$;
+this specific density is shown as $f^+(t)$ in eq. A.3,
+with the congruent/incongruent difference again resulting from differences in $\lambda$.
+
+Taken together, then,
+\begin{eqnarray*}
+\P({\bf A} > {\bf B} | {\bf RT}=t) & = &
+\frac{\beta}{\alpha + \beta} \cdot \frac{f^+(t)}{f(t)}
+\; = \;
+\frac{\beta}{\alpha + \beta} \cdot \frac{\mbox{{\sf exG}}(\tau = 1/(\alpha +  \beta),\mu+\lambda,\sigma)}{f(t)}
+\end{eqnarray*}
+
+An `R` version of this function called `cond_pr_b_less_a` has been added to the GitHub repo, and the following two figures show the values of this conditional probability for both the congruent and incongruent conditions, computed with the same parameters used in the original Fig 10a.
+
+```{r fig_ten_a, echo = FALSE, fig.height=5, fig.width=15}
+source("asr_fit.R")
+source("cond_pr_b_less_a.R")
+# Model parameters:
+tau_a <- 75.2
+tau_b <- 92.6
+mu_C <- 316.2
+sigma_C <- 35.1
+lambda_exc <- 0
+lambda_inh <- 66.6
+soa <- 0
+pc_sup <- 97
+pc_exc <- 98
+pc_inh <- 80
+
+t_range <- 250:800
+congruent_pr_b_less_a <- cond_pr_b_less_a(t_range, tau_a, tau_b, mu_C, sigma_C, lambda_exc, soa)
+incongruent_pr_b_less_a <- cond_pr_b_less_a(t_range, tau_a, tau_b, mu_C, sigma_C, lambda_inh, soa)
+par( mfrow = c(1,2) )  # plot with 1 row, 2 cols
+plot(t_range, congruent_pr_b_less_a, main = "Congruent", xlab = "RT", ylab = "P(B < A|RT)")
+plot(t_range, incongruent_pr_b_less_a, main = "Incongruent", xlab = "RT", ylab = "P(B < A|RT)")
+```
+
+Note that, for incongruent trials, ${\bf B} < {\bf A}$ is most probable at RTs of approximately 400 ms with the current parameter values.
+Thus, these are the trials most likely to have suffered the interference associated with a slow inhibition process.
+
+### PC Conditional on RT
+
+The predictions of PC follow from the description on pp. 1787--1788:
+``As in standard dual-route theorizing, accuracy can then be described
+by assuming that there is one percentage correct, $PC_{sup}$, when
+irrelevant activation is suppressed (i.e., when ${\bf A} < {\bf B}$)
+but other percentages correct when irrelevant activation is not suppressed,
+denoted $PC_{exc}$ and $PC_{inh}$ for congruent and incongruent trials, respectively.''
+
+```{r pcs_given_t, echo = FALSE, fig.height=5, fig.width=15}
+congruent_pcs <- congruent_pr_b_less_a * pc_exc + (1 - congruent_pr_b_less_a) * pc_sup
+incongruent_pcs <- incongruent_pr_b_less_a * pc_inh + (1 - incongruent_pr_b_less_a) * pc_sup
+par( mfrow = c(1,2) )  # plot with 1 row, 2 cols
+plot(t_range, congruent_pcs, main = "Congruent", xlab = "RT", ylab = "P(correct|RT)", ylim = c(85,100) )
+plot(t_range, incongruent_pcs, main = "Incongruent", xlab = "RT", ylab = "P(correct|RT)", ylim = c(85,100) )
+```
+
+Note that PC is high for the fastest incongruent trials with these parameters.
+This is because these fast trials must have had ${\bf A} < {\bf B}$; otherwise, they would have been slowed by $\lambda_{inh}$. 
+
+The predicted PC delta plot is then computed as the difference, at each value of RT, between these two curves.
+The following curve shows that computation, and this curve is a corrected version of the original Fig 10b.
+
+```{r Fig_10b, echo = FALSE, fig.height=5, fig.width=15}
+par( mfrow = c(1,2) )  # plot with 1 row, 2 cols; hack to make panel same size as above
+plot(t_range, congruent_pcs - incongruent_pcs, xlab = "RT",
+     main = "Corrected Fig 10b", ylab = latex2exp::TeX(r'($\Delta_{PC}$)') )
+```
+
+### Reference
+
+Miller, J. & Schwarz, W. (2021). Delta plots for conflict tasks: An activation-suppression race model. *Psychonomic Bulletin and Review, 28*, 1776--1795. doi: 10.3758/s13423-021-01900-5
